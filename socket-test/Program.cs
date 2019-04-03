@@ -1,10 +1,7 @@
-﻿using Quobject.Collections.Immutable;
+﻿using Newtonsoft.Json.Linq;
+using Quobject.Collections.Immutable;
 using Quobject.SocketIoClientDotNet.Client;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace socket_test
 {
@@ -47,6 +44,22 @@ namespace socket_test
             {
                 Console.WriteLine("Message arrived for updated data {0}", message);
             });
+
+            // credentials
+            var credentials = new JObject();
+            credentials["username"] = "username";
+            credentials["password"] = "password";
+            credentials["strategy"] = "local";
+
+            socket.On("reauthentication-error", (message) => {
+                socket.Emit("authenticate", (error, context) => {
+                    Console.WriteLine("reauthenticated");
+                }, credentials);
+            });
+
+            socket.Emit("authenticate", (error, context) => {
+                Console.WriteLine("authenticated");
+            }, credentials);
 
             Console.ReadKey();
         }
